@@ -127,7 +127,7 @@ namespace UART_rcv
                 comport.RtsEnable = false;
 
 
-                comport.BaudRate = 921600;
+                comport.BaudRate = 460800;
                 comport.DataBits = (int)8;
                 comport.StopBits = StopBits.One;
                 comport.Parity = Parity.None;
@@ -209,6 +209,7 @@ namespace UART_rcv
 
             int NN = 512;
             int bytes;
+            string str_bytes;
 
             bytes = comport.BytesToRead;
             while ((bytes > 0) && comport.IsOpen)
@@ -216,7 +217,7 @@ namespace UART_rcv
                 try
                 {
 
-
+                    //str_bytes = comport.ReadExisting();
                     buf.Add(comport.ReadByte());
                     bytes = comport.BytesToRead;
                     //comport.DiscardInBuffer();
@@ -258,8 +259,8 @@ namespace UART_rcv
             //this.Text = buf.Count.ToString();
             this.Text = v.Length.ToString();
             chart1.Series[0].Points.Clear();
-            chart1.ChartAreas[0].AxisY.Minimum = -200;
-            chart1.ChartAreas[0].AxisY.Maximum = 200;
+            chart1.ChartAreas[0].AxisY.Minimum = -128;
+            chart1.ChartAreas[0].AxisY.Maximum = 127;
             foreach (var b in vv)
             {
 
