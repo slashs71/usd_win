@@ -127,7 +127,7 @@ namespace UART_rcv
                 comport.RtsEnable = false;
 
 
-                comport.BaudRate = 460800;
+                comport.BaudRate = 230400;
                 comport.DataBits = (int)8;
                 comport.StopBits = StopBits.One;
                 comport.Parity = Parity.None;
@@ -207,7 +207,7 @@ namespace UART_rcv
         {
             if (!comport.IsOpen) return;
 
-            int NN = 512;
+            int NN = 2048;
             int bytes;
             string str_bytes;
 
@@ -238,7 +238,7 @@ namespace UART_rcv
         private void updateGraph(int[] v)
         {
             
-            int N_FFT = 512;
+            int N_FFT = 2048;
             int[] vv = new int[v.Length];
 
             alglib.complex[] f1;
@@ -248,7 +248,7 @@ namespace UART_rcv
             {
                 if (v[i] > 128)
                 {
-                    vv[i] = v[i] - 256;
+                    vv[i] = v[i] - 255;
                 }
                 else
                 {
@@ -269,17 +269,25 @@ namespace UART_rcv
 
             for (int i = 0; i < vv.Length; i++)
             {
-                d[i] = Convert.ToDouble(vv[i]);
+                d[i] = Convert.ToDouble(vv[i]) * Hanning(i,N_FFT);
             }
             alglib.fftr1d(d, N_FFT, out f1);
 
             chart2.Series[0].Points.Clear();
+            chart2.ChartAreas[0].AxisY.MinorGrid.Enabled = true;
+            chart2.ChartAreas[0].AxisY.MinorGrid.Interval = 1;
+            chart2.ChartAreas[0].AxisY.Minimum = 20;
             chart2.ChartAreas[0].AxisY.Maximum = Convert.ToDouble(UpDown_Amax.Value);
-            for (int i = 0; i < N_FFT / 2; i++)
+            for (int i = 0; i < 256; i++)
             {
-                chart2.Series[0].Points.AddY(alglib.math.abscomplex(f1[i]));
+                chart2.Series[0].Points.AddY(20*Math.Log10(alglib.math.abscomplex(f1[i])));
             }
 
+        }
+
+        private double Hanning(int i, int n_FFT)
+        {
+            return (0.5386-0.46164*Math.Cos(2*Math.PI*i/(n_FFT-1)));
         }
 
         private void btnSigGenStart_Click(object sender, EventArgs e)
